@@ -1,155 +1,105 @@
+<!--
+  +page.svelte — la pagina principale di Plokk
+  Per ora è solo una base pulita: titolo, bottone, risultato.
+  Nei prossimi sprint aggiungeremo la lista dei file, il
+  pannello glass, il drag & drop.
+-->
 <script lang="ts">
   import { invoke } from "@tauri-apps/api/core";
 
-  let name = $state("");
-  let greetMsg = $state("");
+  // $state: variabile reattiva. Quando cambia, la UI si aggiorna da sola.
+  let response = $state("");
 
-  async function greet(event: Event) {
-    event.preventDefault();
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    greetMsg = await invoke("greet", { name });
+  // Chiama il comando Rust "ping" e mette il risultato in `response`.
+  async function testConnection() {
+    response = await invoke("ping");
   }
 </script>
 
 <main class="container">
-  <h1>Welcome to Tauri + Svelte</h1>
+  <h1>Plokk</h1>
+  <p class="subtitle">Sprint 1 — test connessione Rust ↔ Svelte</p>
 
-  <div class="row">
-    <a href="https://vite.dev" target="_blank">
-      <img src="/vite.svg" class="logo vite" alt="Vite Logo" />
-    </a>
-    <a href="https://tauri.app" target="_blank">
-      <img src="/tauri.svg" class="logo tauri" alt="Tauri Logo" />
-    </a>
-    <a href="https://svelte.dev" target="_blank">
-      <img src="/svelte.svg" class="logo svelte-kit" alt="SvelteKit Logo" />
-    </a>
-  </div>
-  <p>Click on the Tauri, Vite, and SvelteKit logos to learn more.</p>
+  <button onclick={testConnection}>Test connessione</button>
 
-  <form class="row" onsubmit={greet}>
-    <input id="greet-input" placeholder="Enter a name..." bind:value={name} />
-    <button type="submit">Greet</button>
-  </form>
-  <p>{greetMsg}</p>
+  {#if response}
+    <p class="result">{response}</p>
+  {/if}
 </main>
 
 <style>
-  .logo.vite:hover {
-    filter: drop-shadow(0 0 2em #747bff);
-  }
-
-  .logo.svelte-kit:hover {
-    filter: drop-shadow(0 0 2em #ff3e00);
-  }
-
-  :root {
-    font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
-    font-size: 16px;
-    line-height: 24px;
-    font-weight: 400;
-
-    color: #0f0f0f;
-    background-color: #f6f6f6;
-
-    font-synthesis: none;
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-text-size-adjust: 100%;
+  :global(html, body) {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: #f5f5f7;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui,
+      sans-serif;
   }
 
   .container {
-    margin: 0;
-    padding-top: 10vh;
+    height: 100vh;
     display: flex;
     flex-direction: column;
+    align-items: center;
     justify-content: center;
-    text-align: center;
-  }
-
-  .logo {
-    height: 6em;
-    padding: 1.5em;
-    will-change: filter;
-    transition: 0.75s;
-  }
-
-  .logo.tauri:hover {
-    filter: drop-shadow(0 0 2em #24c8db);
-  }
-
-  .row {
-    display: flex;
-    justify-content: center;
-  }
-
-  a {
-    font-weight: 500;
-    color: #646cff;
-    text-decoration: inherit;
-  }
-
-  a:hover {
-    color: #535bf2;
+    gap: 1rem;
   }
 
   h1 {
-    text-align: center;
+    margin: 0;
+    font-size: 2.5rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: #0d0d0d;
   }
 
-  input,
-  button {
-    border-radius: 8px;
-    border: 1px solid transparent;
-    padding: 0.6em 1.2em;
-    font-size: 1em;
-    font-weight: 500;
-    font-family: inherit;
-    color: #0f0f0f;
-    background-color: #ffffff;
-    transition: border-color 0.25s;
-    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
+  .subtitle {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #6b7280;
   }
 
   button {
+    margin-top: 1rem;
+    padding: 0.7rem 1.4rem;
+    border-radius: 10px;
+    border: 1px solid #d1d5db;
+    background: white;
+    color: #0d0d0d;
+    font-size: 0.95rem;
+    font-weight: 600;
     cursor: pointer;
+    transition: all 0.15s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
   }
 
   button:hover {
-    border-color: #396cd8;
+    border-color: #4d6bfe;
+    color: #4d6bfe;
+    transform: translateY(-1px);
   }
+
   button:active {
-    border-color: #396cd8;
-    background-color: #e8e8e8;
+    transform: scale(0.97);
   }
 
-  input,
-  button {
-    outline: none;
+  .result {
+    margin-top: 1rem;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #4d6bfe;
+    animation: pop 0.3s cubic-bezier(0.34, 1.4, 0.4, 1);
   }
 
-  #greet-input {
-    margin-right: 5px;
-  }
-
-  @media (prefers-color-scheme: dark) {
-    :root {
-      color: #f6f6f6;
-      background-color: #2f2f2f;
+  @keyframes pop {
+    from {
+      opacity: 0;
+      transform: scale(0.8);
     }
-
-    a:hover {
-      color: #24c8db;
-    }
-
-    input,
-    button {
-      color: #ffffff;
-      background-color: #0f0f0f98;
-    }
-    button:active {
-      background-color: #0f0f0f69;
+    to {
+      opacity: 1;
+      transform: scale(1);
     }
   }
 </style>
